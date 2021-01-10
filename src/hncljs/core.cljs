@@ -15,32 +15,32 @@
 (def base-url "https://hacker-news.firebaseio.com/v0/")
 (def topstories (str base-url "topstories.json"))
 
-(defn fetch-link! [url]
-  (-> (js/fetch url)
-      (p/then #(.json %))
-      (p/then (fn [data] data))))
-
 (comment
   (.then (fetch-link! (str base-url "item/25710055.json"))
          #(js/console.log (.-title %)))
   )
 
+; fetch stuff form url and reset state
 (defn fetch-stuff [url state]
-  (p/let [res (fetch-link! url)]
+  (p/let [res (-> (js/fetch url)
+                  (p/then #(.json %))
+                  (p/then (fn [data] data)))]
     (reset! state res)))
 
-;(nil? nil)
-
+; post item component
 (defn each-post [id]
-  (let [post-data (r/atom "data")
+  (let [post-data (r/atom "")
         query (str base-url "item/" id ".json")] 
     (fn []
       (do
-        (when (= @post-data "data") (fetch-stuff query post-data))
-        [:p (.-title @post-data)]))))
+        (when (= @post-data "") (fetch-stuff query post-data))
+        [:div.cards [:b (.-title @post-data)]
+         [:p [:span (.-by @post-data)]
+          [:a {:href (.-url @post-data) :style {:margin-left "20px"}} "visit"]]]))))
 
+; posts list component
 (defn posts-list []
-  [:div.cards
+  [:div
    [:h2.card-header.text-center "Hacker News Data"]
    #_[:button {:on-click #(fetch-stuff topstories data)} "fetch-hn_data"]
    (do
@@ -48,7 +48,8 @@
      (for [i (take 10 @data)]
        [:div {:style {:margin "10px"} :key i} [each-post i]]))])
 
-(defn home-page []
+; app component
+(defn app []
   [:div
    [posts-list]])
 
@@ -56,7 +57,7 @@
 ;; Initialize app
 
 (defn mount-root []
-  (d/render [home-page] (.getElementById js/document "app")))
+  (d/render [app] (.getElementById js/document "app")))
 
 (defn ^:export init! []
   (mount-root))

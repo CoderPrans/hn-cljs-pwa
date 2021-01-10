@@ -32,3 +32,12 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+.cards {
+    margin: 30px 10px;
+}
+
+p {
+    margin: 5px;
+}
+
