@@ -8,6 +8,7 @@
 ;; Views
 
 (def items (r/atom nil))
+(def show-page (r/atom nil))
 
 ;; app-state [{:id 245189
 ;;             :title "Post Title"} {}] 
@@ -36,28 +37,77 @@
     (fn []
       (do
         (when (= @post-data "") (fetch-stuff query post-data))
-        [:div.cards
-         [:span {:style {:flex 1}} (.-score @post-data)]
-         [:div {:style {:flex 10}} [:b (.-title @post-data)]
-          [:p [:span (.-by @post-data)]
-           [:a {:href (.-url @post-data)
-                :style {:margin-left "20px"}} "visit"]]]
-         ]))))
+        (if (nil? (keys (js->clj @post-data)))
+          [:p "..."]
+          [:div.cards
+           [:span {:style {:margin-right "25px"
+                           :font-size "20px"}}
+            (.-score @post-data)]
+           [:div 
+            [:p [:b (.-title @post-data)]
+             " // " [:a {:href (.-url @post-data)}
+                     (get-src (.-url @post-data))]]
+            [:p [:span (.-by @post-data)]
+             
+             [:button {:on-click #(reset! show-page id)}
+              (.-descendants @post-data) " comments"]
+             ]]])))))
+
+(defn get-src [url]
+  (nth (.split url "/") 2))
+
+(get-src "https://www.google.com/now/present/always")
 
 ; posts list component
 (defn posts-list []
   [:div
-   [:h2.card-header.text-center "Hacker News Data"]
    #_[:button {:on-click #(fetch-stuff topstories data)} "fetch-hn_data"]
    (do
      (when-not @items (fetch-stuff topstories items))
      (for [i (take 10 @items)]
        [:div {:style {:margin "10px"} :key i} [each-post i]]))])
 
+; each comment component
+(defn each-comment [id]
+  (let [comm-data (r/atom "")
+        query (query-item id)]
+    (fn []
+      (do
+        (when (= @comm-data "") (fetch-stuff query comm-data))
+        (if (nil? (keys (js->clj @comm-data)))
+          [:p "..."]
+          [:div
+           [:b (.-by @comm-data)]
+           [:p {:dangerouslySetInnerHTML {:__html (.-text @comm-data)}}]
+           ])))))
+
+; post page component
+(defn post-page [id]
+  (let [post-data (r/atom "")
+        query (query-item id)]
+    (fn []
+      (do
+        (when (= @post-data "") (fetch-stuff query post-data))
+        (if (nil? (keys (js->clj @post-data)))
+          [:p "..."]
+          [:div
+           [:h4 (.-title @post-data)]
+           [:p (.-by @post-data)]
+           [:hr ]
+           (for [comm (.-kids @post-data)]
+             [:div {:style {:margin "30px 0px"} :key comm}
+              [each-comment comm]])])))))
+
 ; app component
 (defn app []
-  [:div
-   [posts-list]])
+  [:div 
+   [:h2.card-header.text-center "Hacker News PWA"]
+   (if (nil? @show-page)
+     [posts-list]
+     [:div
+      [:button {:on-click #(reset! show-page nil)
+                :class "back-button"} "back"]
+      [post-page @show-page]])])
 
 ;; -------------------------
 ;; Initialize app

@@ -2,11 +2,11 @@ body {
   font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
   max-width: 800px;
   margin: 0 auto;
-  padding: 52px;
+  padding: 12px;
   -webkit-font-smoothing: antialiased;
   font-size: 1.125em;
   color: #333;
-  line-height: 1.5em;
+  line-height: 2em;
 }
 
 h1, h2, h3 {
@@ -44,3 +44,17 @@ p {
     margin: 5px;
 }
 
+button {
+    background: yellow;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 5px 20px;
+    cursor: pointer;
+}
+.back-button {
+    position: absolute;
+    top: 22px;
+    left: 10px;
+}
