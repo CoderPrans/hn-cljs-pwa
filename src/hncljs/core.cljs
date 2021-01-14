@@ -9,19 +9,16 @@
 
 (def items (r/atom nil))
 (def show-page (r/atom nil))
+(def page-n (r/atom 1))
 
 ;; app-state [{:id 245189
 ;;             :title "Post Title"} {}] 
 
 (def base-url "https://hacker-news.firebaseio.com/v0/")
 (def topstories (str base-url "topstories.json"))
+
 (defn query-item [i]
   (str base-url "item/" i ".json"))
-
-(comment
-  (.then (fetch-link! (str base-url "item/25710055.json"))
-         #(js/console.log (.-title %)))
-  )
 
 ; fetch stuff form url and reset state
 (defn fetch-stuff [url state]
@@ -40,31 +37,34 @@
         (if (nil? (keys (js->clj @post-data)))
           [:p "..."]
           [:div.cards
-           [:span {:style {:margin-right "25px"
-                           :font-size "20px"}}
-            (.-score @post-data)]
-           [:div 
-            [:p [:b (.-title @post-data)]
-             " // " [:a {:href (.-url @post-data)}
-                     (get-src (.-url @post-data))]]
+           [:span {:style
+                   {:margin-right "25px"
+                    :font-size "20px"}} (.-score @post-data)]
+           [:div [:p [:b (.-title @post-data)]
+                  " // " [:a {:href (.-url @post-data)}
+                          (get-src (.-url @post-data))]]
             [:p [:span (.-by @post-data)]
-             
              [:button {:on-click #(reset! show-page id)}
-              (.-descendants @post-data) " comments"]
-             ]]])))))
+              (.-descendants @post-data) " comments"]]]])))))
 
 (defn get-src [url]
   (nth (.split url "/") 2))
 
-(get-src "https://www.google.com/now/present/always")
+;; (get-src "https://www.google.com/now/present/always")
+
+(drop 10 (take 20 (range 500)))
 
 ; posts list component
 (defn posts-list []
   [:div
-   #_[:button {:on-click #(fetch-stuff topstories data)} "fetch-hn_data"]
+   [:div
+    [:button {:on-click #(swap! page-n dec) :disabled (= @page-n 1)} "prev"]
+    [:span "page " @page-n]
+    [:button {:on-click #(swap! page-n inc)} "next"]]
    (do
      (when-not @items (fetch-stuff topstories items))
-     (for [i (take 10 @items)]
+     (for [i (drop (* (dec @page-n) 10)
+                   (take (* @page-n 10) @items))]
        [:div {:style {:margin "10px"} :key i} [each-post i]]))])
 
 ; each comment component
@@ -76,10 +76,9 @@
         (when (= @comm-data "") (fetch-stuff query comm-data))
         (if (nil? (keys (js->clj @comm-data)))
           [:p "..."]
-          [:div
-           [:b (.-by @comm-data)]
-           [:p {:dangerouslySetInnerHTML {:__html (.-text @comm-data)}}]
-           ])))))
+          [:div [:b (.-by @comm-data)]
+           [:p {:dangerouslySetInnerHTML
+                {:__html (.-text @comm-data)}}]])))))
 
 ; post page component
 (defn post-page [id]
@@ -105,8 +104,8 @@
    (if (nil? @show-page)
      [posts-list]
      [:div
-      [:button {:on-click #(reset! show-page nil)
-                :class "back-button"} "back"]
+      [:button.back-button
+       {:on-click #(reset! show-page nil)} "back"]
       [post-page @show-page]])])
 
 ;; -------------------------
