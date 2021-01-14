@@ -7,13 +7,15 @@
 ;; -------------------------
 ;; Views
 
-(def data (r/atom nil))
+(def items (r/atom nil))
 
 ;; app-state [{:id 245189
 ;;             :title "Post Title"} {}] 
 
 (def base-url "https://hacker-news.firebaseio.com/v0/")
 (def topstories (str base-url "topstories.json"))
+(defn query-item [i]
+  (str base-url "item/" i ".json"))
 
 (comment
   (.then (fetch-link! (str base-url "item/25710055.json"))
@@ -30,13 +32,17 @@
 ; post item component
 (defn each-post [id]
   (let [post-data (r/atom "")
-        query (str base-url "item/" id ".json")] 
+        query (query-item id)] 
     (fn []
       (do
         (when (= @post-data "") (fetch-stuff query post-data))
-        [:div.cards [:b (.-title @post-data)]
-         [:p [:span (.-by @post-data)]
-          [:a {:href (.-url @post-data) :style {:margin-left "20px"}} "visit"]]]))))
+        [:div.cards
+         [:span {:style {:flex 1}} (.-score @post-data)]
+         [:div {:style {:flex 10}} [:b (.-title @post-data)]
+          [:p [:span (.-by @post-data)]
+           [:a {:href (.-url @post-data)
+                :style {:margin-left "20px"}} "visit"]]]
+         ]))))
 
 ; posts list component
 (defn posts-list []
@@ -44,8 +50,8 @@
    [:h2.card-header.text-center "Hacker News Data"]
    #_[:button {:on-click #(fetch-stuff topstories data)} "fetch-hn_data"]
    (do
-     (when-not @data (fetch-stuff topstories data))
-     (for [i (take 10 @data)]
+     (when-not @items (fetch-stuff topstories items))
+     (for [i (take 10 @items)]
        [:div {:style {:margin "10px"} :key i} [each-post i]]))])
 
 ; app component
