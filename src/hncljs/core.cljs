@@ -41,14 +41,19 @@
                    {:margin-right "25px"
                     :font-size "20px"}} (.-score @post-data)]
            [:div [:p [:b (.-title @post-data)]
-                  " // " [:a {:href (.-url @post-data)}
-                          (get-src (.-url @post-data))]]
+                  " // "
+                  (when (contains?
+                         (set (keys (js->clj @post-data))) "url")
+                    [:a {:href (.-url @post-data)}
+                     (get-src (.-url @post-data))])]
             [:p [:span (.-by @post-data)]
              [:button {:on-click #(reset! show-page id)}
               (.-descendants @post-data) " comments"]]]])))))
 
 (defn get-src [url]
   (nth (.split url "/") 2))
+
+((set (keys {:a "apple" :b "ball" :c "cherry"})) :c)
 
 ;; (get-src "https://www.google.com/now/present/always")
 
