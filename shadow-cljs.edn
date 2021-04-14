@@ -4,6 +4,7 @@
                 [reagent "1.0.0"]
                 [kitchen-async "0.1.0-SNAPSHOT"]
                 [re-frame "1.2.0"]
+                [cljs-ajax "0.7.3"]
                 [day8.re-frame/http-fx "0.2.3"]]
 
  :builds       {:app {:target     :browser

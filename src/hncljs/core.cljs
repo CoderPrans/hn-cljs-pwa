@@ -119,8 +119,10 @@
 (defonce do-timer (js/setInterval dispatch-timer-event 1000))
 
 ;; -- Domino 2 - Event Handlers
+;;; from hncljs.handlers
 
 ;; -- Domino 4 - Query
+;;; from hnljs.subs
 
 ;; -- Domino 5 - View Function
 
@@ -145,14 +147,6 @@
    [clock]
    [color-input]])
 
-(defn ^:dev/after-load clear-cache-and-render!
-  []
-  ;; The `:dev/after-load` metadata causes this function to be called
-  ;; after shadow-cljs hot-reloads code. We force a UI update by clearing
-  ;; the Reframe subscription cache.
-  (rf/clear-subscription-cache!)
-  (render))
-
 ;; -------------------------
 ;; Initialize app
 
@@ -171,6 +165,25 @@
 (defn mount-root []
   (d/render [app] (.getElementById js/document "app")))
 
+(defn ^:dev/after-load clear-cache-and-render!
+  []
+  ;; The `:dev/after-load` metadata causes this function to be called
+  ;; after shadow-cljs hot-reloads code. We force a UI update by clearing
+  ;; the Reframe subscription cache.
+  (rf/clear-subscription-cache!)
+  (mount-root))
+
 (defn ^:export init! []
   (rf/dispatch-sync [:initialize])
   (mount-root))
+
+
+;; (def test-db (r/atom {:data {}}))
+
+;; ((fn [id] (swap! test-db assoc-in [:data (keyword (str id))] 23456)) 23)
+
+;; (assoc test-db :items [2324 2365 2334])
+
+;; (:23 (:data @test-db))
+
+
