@@ -49,7 +49,7 @@
    {:http-xhrio {:method            :get
                  :uri               url
                  :format            (ajax/json-request-format)
-                 :response-format   (ajax/json-response-format)
+                 :response-format   (ajax/json-response-format {:keywords? true})
                  :on-success        [:process-response :story]
                  :on-failure        [:bad-response :story]}
     :db (assoc db :stories-loading? true)}))
@@ -62,7 +62,7 @@
    {:http-xhrio {:method            :get
                  :uri               url
                  :format            (ajax/json-request-format)
-                 :response-format   (ajax/json-response-format)
+                 :response-format   (ajax/json-response-format {:keywords? true})
                  :on-success        [:process-response :post]
                  :on-failure        [:bad-response :post]}
     :db (assoc db :post-loading? true)}))
@@ -75,7 +75,7 @@
    {:http-xhrio {:method            :get
                  :uri               url
                  :format            (ajax/json-request-format)
-                 :response-format   (ajax/json-response-format)
+                 :response-format   (ajax/json-response-format {:keywords? true})
                  :on-success        [:process-response :comm]
                  :on-failure        [:bad-response :comm]}
     :db (assoc db :comm-loading? true)}))
@@ -92,11 +92,13 @@
      :post (-> db
                (assoc :post-loading? false)
                (assoc-in
-                [:posts-data (keyword (str (.-id response)))]
-                (js->clj response)))
+                [:posts-data (keyword (str (:id response)))]
+                response))
      :comm (-> db
                (assoc :comm-loading? false)
-               (assoc :comments (js->clj response))))))
+               (assoc-in
+                [:comments (keyword (str (:id response)))]
+                response)))))
 
 ;; handle failure
 

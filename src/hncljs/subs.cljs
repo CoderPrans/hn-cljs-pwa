@@ -37,19 +37,19 @@
    (:page-n db)))
 
 (rf/reg-sub
- :stories-loading
+ :stories-loading?
  (fn [db _]
-   (:stories-loading db)))
+   (:stories-loading? db)))
 
 (rf/reg-sub
- :post-loading
+ :post-loading?
  (fn [db _]
-   (:post-loading db)))
+   (:post-loading? db)))
 
 (rf/reg-sub
- :comm-loading
+ :comm-loading?
  (fn [db _]
-   (:comm-loading db)))
+   (:comm-loading? db)))
 
 (rf/reg-sub
  :error
