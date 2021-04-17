@@ -16,16 +16,25 @@
 (defn get-src [url]
   (nth (.split url "/") 2))
 
+
+(defn comm-view [data]
+  [:div
+   [:b (:by data)]
+   [:p {:dangerouslySetInnerHTML
+        {:__html (:text data)}}]])
+
 (defn each-comment [id]
   (let [data (rf/subscribe [:comments])
-        loading? @(rf/subscribe [:comm-loading?])
         query (query-item id)
         key (keyword (str id))
-        _ (when-not (key @data) (rf/dispatch [:get-comm-data query]))]
-    (fn []
-      [:div [:b (:by (key @data))]
-       [:p {:dangerouslySetInnerHTML
-            {:__html (:text (key @data))}}]])))
+        _ (when-not (key @data) (rf/dispatch [:get-comm-data query id]))]
+    #_(conj [:div] (for [comm (:kids (key @data))]
+                        (each-comment comm)))
+    [:div
+     [comm-view (key @data)]
+     (when-let [kids (:kids (key @data))] 
+       (for [cid kids]
+         [:div.replies  {:key cid} [each-comment cid]]))]))
 
 (defn post-page [id]
   (let [data @(rf/subscribe [:posts-data])
@@ -42,7 +51,7 @@
             [each-comment comm]])]))))
 
 (defn post-desc-view [data id]
-  (if (nil? data) 
+  (if (or (nil? data) (= data "fetching")) 
     [:p "..."]
     [:div.cards
      [:span {:style {:margin-right "25px"
@@ -53,14 +62,13 @@
               [:a {:href (:url data)} " // " (get-src (:url data))])]
       [:p [:span (:by data)]
        [:button {:on-click (fn [] (rf/dispatch [:set-post-page id]))}
-        (count (:kids data)) " comments"]]]]))
+        (:descendants data) " comments"]]]]))
 
 (defn each-post [id]
   (let [data (rf/subscribe [:posts-data])
-        loading? @(rf/subscribe [:post-loading?])
         query (query-item id)
         key (keyword (str id))
-        _ (when-not (key @data) (rf/dispatch [:get-post-data query]))] 
+        _ (when-not (key @data) (rf/dispatch [:get-post-data query id]))] 
     (fn []
       [post-desc-view (key @data) id])))
 
@@ -90,3 +98,4 @@
         [:button.back-button
          {:on-click (fn [] (rf/dispatch [:clear-post-page]))} "back"]
         [post-page post-id]]))])
+

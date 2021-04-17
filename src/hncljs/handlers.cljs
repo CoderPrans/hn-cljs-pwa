@@ -58,27 +58,27 @@
 
 (rf/reg-event-fx
  :get-post-data
- (fn [{:keys [db]} [_ url]]
+ (fn [{:keys [db]} [_ url item]]
    {:http-xhrio {:method            :get
                  :uri               url
                  :format            (ajax/json-request-format)
                  :response-format   (ajax/json-response-format {:keywords? true})
                  :on-success        [:process-response :post]
                  :on-failure        [:bad-response :post]}
-    :db (assoc db :post-loading? true)}))
+    :db (assoc-in db [:posts-data (keyword (str item))] "fetching")}))
 
 ;; get comments data
 
 (rf/reg-event-fx
  :get-comm-data
- (fn [{:keys [db]} [_ url]]
+ (fn [{:keys [db]} [_ url item]]
    {:http-xhrio {:method            :get
                  :uri               url
                  :format            (ajax/json-request-format)
                  :response-format   (ajax/json-response-format {:keywords? true})
                  :on-success        [:process-response :comm]
                  :on-failure        [:bad-response :comm]}
-    :db (assoc db :comm-loading? true)}))
+    :db (assoc-in db [:comments (keyword (str item))] "fetching")}))
 
 ;; handle sucess
 
@@ -90,12 +90,10 @@
                 (assoc :story-loading? false)
                 (assoc :items response))
      :post (-> db
-               (assoc :post-loading? false)
                (assoc-in
                 [:posts-data (keyword (str (:id response)))]
                 response))
      :comm (-> db
-               (assoc :comm-loading? false)
                (assoc-in
                 [:comments (keyword (str (:id response)))]
                 response)))))
@@ -110,9 +108,7 @@
                 (assoc :story-loading? false)
                 (assoc :error response))
      :post (-> db
-               (assoc :post-loading? false)
                (assoc :error response))
      :comm (-> db
-               (assoc :comm-loading? false)
                (assoc :error response)))))
 

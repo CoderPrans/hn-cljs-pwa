@@ -55,6 +55,12 @@ button {
 }
 .back-button {
     position: absolute;
-    top: 22px;
+    top: 5px;
+    left: 7px;
+}
+.replies {
+    position: relative;
     left: 10px;
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+    padding-left: 10px;
 }

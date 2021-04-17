@@ -42,16 +42,6 @@
    (:stories-loading? db)))
 
 (rf/reg-sub
- :post-loading?
- (fn [db _]
-   (:post-loading? db)))
-
-(rf/reg-sub
- :comm-loading?
- (fn [db _]
-   (:comm-loading? db)))
-
-(rf/reg-sub
  :error
  (fn [db _]
    (:error db)))

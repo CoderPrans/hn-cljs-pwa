@@ -12,8 +12,6 @@
    :page-n 1
  ;; loading state
    :stories-loading? false
-   :post-loading? false
-   :comm-loading? false
  ;; error state
    :error nil})
 
