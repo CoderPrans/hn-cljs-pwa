@@ -27,20 +27,6 @@
  (fn [db [_ new-page]]
    (assoc db :page-n new-page)))
 
-;; set show page
-
-(rf/reg-event-db
- :set-post-page
- (fn [db [_ id]]
-   (assoc db :show-page id)))
-
-;; clear show page
-
-(rf/reg-event-db
- :clear-post-page
- (fn [db _]
-   (assoc db :show-page nil)))
-
 ;; get topstories
 
 (rf/reg-event-fx

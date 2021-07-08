@@ -4,7 +4,8 @@
                 [reagent "1.0.0"]
                 [re-frame "1.2.0"]
                 [cljs-ajax "0.7.3"]
-                [day8.re-frame/http-fx "0.2.3"]]
+                [day8.re-frame/http-fx "0.2.3"]
+                [metosin/reitit "0.5.13"]]
 
  :builds       {:app {:target     :browser
                       :output-dir "public/js"

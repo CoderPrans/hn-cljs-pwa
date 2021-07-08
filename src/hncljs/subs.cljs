@@ -27,11 +27,6 @@
    (:comments db)))
 
 (rf/reg-sub
- :show-page
- (fn [db _]
-   (:show-page db)))
-
-(rf/reg-sub
  :page-n
  (fn [db _]
    (:page-n db)))

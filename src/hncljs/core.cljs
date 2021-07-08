@@ -2,10 +2,17 @@
     (:require
       [reagent.dom :as d]
       [re-frame.core :as rf]
-      [hncljs.views :as views]))
+      [hncljs.routes :as routes]))
+
+(defn app []
+  [:div
+   [:h2.card-header.text-center "Hacker News PWA"]
+   (if-let [match @routes/match]
+     (let [view (:view (:data match))]
+       [view match]))])
 
 (defn mount-root []
-  (d/render [views/app] (.getElementById js/document "app")))
+  (d/render [app] (.getElementById js/document "app")))
 
 (defn ^:dev/after-load clear-cache-and-render!
   []
@@ -17,6 +24,7 @@
 
 (defn ^:export init! []
   (rf/dispatch-sync [:initialize])
+  (routes/init!)
   (mount-root))
 
 

@@ -1,18 +1,15 @@
 (ns hncljs.db)
 
 (def initial-db
-  {:time (js/Date.)
-   :time-color "#f88"
- ;; server state
+  {;; server state
    :items nil
    :posts-data nil
    :comments nil
- ;; local state
-   :show-page nil
+   ;; local state
    :page-n 1
- ;; loading state
+   ;; loading state
    :stories-loading? false
- ;; error state
+   ;; error state
    :error nil})
 
 ;; posts-data: {:id1 {:url url :title title :by by :kids []}
