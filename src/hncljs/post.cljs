@@ -37,9 +37,7 @@
         post (key data)]
     [:div
      [:a {:href (state/href :home)}
-      [:button.back-button
-       "back"]]
-     (js/console.log data)
+      [:button.back-button "back"]]
      (if (nil? (keys (key data)))
        [:p "nothing to show . ."]
        [:div
